@@ -1,4 +1,4 @@
-# sha1-implementation
+# C++ SHA-1 Implementation
 SHA-1 Implementation written in C++.
 
 #### DO NOT USE: SHA-1 is broken and this project was written for educational purposes only.
