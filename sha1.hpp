@@ -143,8 +143,8 @@ namespace math_nerd
         }
 
         constexpr auto process( std::array<Word, ROUND_COUNT> const &schedule,
-                                       std::array<Word,           5>       &digest,
-                                       std::size_t const                    round )
+                                std::array<Word,           5>       &digest,
+                                std::size_t const                    round )
         {
             constexpr auto f1 = []( Word const B, Word const C, Word const D )
             {
@@ -162,7 +162,7 @@ namespace math_nerd
                 // Compiler optimizes to (B & (C | D)) | (C & D) for us.
             };
 
-            auto newE{ digest[E] + schedule[round] + left_rotate(digest[A], 5)};
+            auto newE{ digest[E] + schedule[round] + left_rotate(digest[A], 5) };
 
             switch ( round / 20 )
             {
