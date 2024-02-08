@@ -34,6 +34,7 @@ namespace math_nerd
         constexpr std::size_t BLOCK_BYTES{ BLOCK_BITS / 8 };
         constexpr std::size_t BLOCK_WORDS{ BLOCK_BYTES / WORD_SIZE };
         constexpr std::size_t ROUND_COUNT{ 80 };
+        constexpr std::size_t DIGEST_SIZE{ 5 };
 
         constexpr std::array DEFAULT_DIGEST{ 0x67452301u, 0xEFCDAB89u, 0x98BADCFEU, 0x10325476u, 0xC3D2E1F0u };
         constexpr std::array ROUND_CONSTANT{ 0x5A827999u, 0x6ED9EBA1u, 0x8F1BBCDCu, 0xCA62C1D6u };
@@ -143,7 +144,7 @@ namespace math_nerd
         }
 
         constexpr auto process( std::array<Word, ROUND_COUNT> const &schedule,
-                                std::array<Word,           5>       &digest,
+                                std::array<Word, DIGEST_SIZE>       &digest,
                                 std::size_t const                    round )
         {
             constexpr auto f1 = []( Word const B, Word const C, Word const D )
@@ -218,7 +219,7 @@ namespace math_nerd
         }
 
         [[nodiscard]]
-        constexpr auto digest_to_hex( std::array<Word, 5> const &digest )
+        constexpr auto digest_to_hex( std::array<Word, DIGEST_SIZE> const &digest )
         {
             std::string hex{};
 
@@ -250,7 +251,7 @@ namespace math_nerd
                     process( message_schedule, digest, round );
                 }
 
-                for ( auto i{ 0u }; i < 5; ++i )
+                for ( auto i{ 0u }; i < DIGEST_SIZE; ++i )
                 {
                     digest[i] += temp_digest[i];
                 }
