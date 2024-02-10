@@ -39,24 +39,6 @@ namespace math_nerd
         };
 
         [[nodiscard]]
-        constexpr auto change_endianness( Word const word )
-        {
-            if constexpr ( std::endian::native == std::endian::big )
-            {
-                return (word << 24)
-                    | ((word & 0x0000FF00) << 8)
-                    | ((word & 0x00FF0000) >> 8)
-                    |  (word >> 24);
-            }
-            else if constexpr ( std::endian::native == std::endian::little )
-            {
-                return word;
-            }
-
-            return word;
-        }
-
-        [[nodiscard]]
         constexpr auto left_rotate( Word const word, std::size_t const shift )
         {
             return (word << shift) | (word >> (WORD_BITS - shift));
@@ -115,10 +97,6 @@ namespace math_nerd
                                              word *  WORD_BYTES +
                                              byte];
                 }
-
-                // If on a big endian system, readjust endianness.
-                // Does nothing on little endian systems.
-                schedule[word] = change_endianness( schedule[word] );
             }
 
             // Build the rest of the schedule.
