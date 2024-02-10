@@ -10,31 +10,21 @@
     \brief SHA-1 Hash Implementation - Educational purposes only, DO NOT USE!
 */
 
-/** \namespace math_nerd
-    \brief Namespace for all of my projects.
-*/
 namespace math_nerd
 {
-    /** \namespace sha1
-        \brief Namespace for the SHA-1 implementation.
-    */
     namespace sha1
     {
-        /** \name 32-bit Word
-         */
         using Word = std::uint32_t;
-
-        /** \name 8-bit Byte
-         */
         using Byte = std::uint8_t;
 
-        constexpr std::size_t WORD_SIZE  { sizeof( Word ) };
-        constexpr std::size_t WORD_BITS  { WORD_SIZE * 8 };
-        constexpr std::size_t BLOCK_BITS { 512 };
-        constexpr std::size_t BLOCK_BYTES{ BLOCK_BITS / 8 };
-        constexpr std::size_t BLOCK_WORDS{ BLOCK_BYTES / WORD_SIZE };
-        constexpr std::size_t ROUND_COUNT{ 80 };
-        constexpr std::size_t DIGEST_SIZE{ 5 };
+        constexpr std::size_t WORD_BYTES  { sizeof( Word ) };
+        constexpr std::size_t WORD_BITS   { WORD_BYTES *  8 };
+        constexpr std::size_t BLOCK_BITS  {  WORD_BITS * 16 };
+        constexpr std::size_t BLOCK_BYTES { BLOCK_BITS /  8 };
+        constexpr std::size_t BLOCK_WORDS { BLOCK_BYTES / WORD_BYTES };
+        constexpr std::size_t ROUND_COUNT { 80 };
+        constexpr std::size_t DIGEST_SIZE {  5 };
+        constexpr std::size_t STAGE_ROUNDS{ 20 };
 
         constexpr std::array DEFAULT_DIGEST{ 0x67452301u, 0xEFCDAB89u, 0x98BADCFEU, 0x10325476u, 0xC3D2E1F0u };
         constexpr std::array ROUND_CONSTANT{ 0x5A827999u, 0x6ED9EBA1u, 0x8F1BBCDCu, 0xCA62C1D6u };
@@ -75,9 +65,9 @@ namespace math_nerd
         [[nodiscard]]
         constexpr auto pad( std::string_view input )
         {
-            std::size_t padded_size{ input.size() - (input.size() % 64)};
+            std::size_t padded_size{ input.size() - (input.size() % BLOCK_BYTES)};
 
-            if ( input.size() % BLOCK_BYTES < 56 )
+            if ( input.size() % BLOCK_BYTES < BLOCK_BYTES - 8 )
             {
                 padded_size += BLOCK_BYTES;
             }
@@ -102,7 +92,7 @@ namespace math_nerd
             for ( auto i{ 0u }; i < 8; ++i )
             {
                 byte_vector[padded_size - 8 + i] =
-                    static_cast<Byte>((bitsize >> (56 - 8 * i)) & 0xFF);
+                    static_cast<Byte>((bitsize >> (BLOCK_BYTES - 8 * (i + 1))) & 0xFF);
             }
 
             return byte_vector;
@@ -118,12 +108,12 @@ namespace math_nerd
             {
                 schedule[word] = 0;
 
-                for ( auto byte{ 0u }; byte < 4; ++byte )
+                for ( auto byte{ 0u }; byte < WORD_BYTES; ++byte )
                 {
                     schedule[word] = (schedule[word] << 8) +
-                                      input[block * 64 +
-                                            word * 4 +
-                                            byte];
+                                      input[block * BLOCK_BYTES +
+                                             word *  WORD_BYTES +
+                                             byte];
                 }
 
                 // If on a big endian system, readjust endianness.
@@ -165,7 +155,7 @@ namespace math_nerd
 
             auto newE{ digest[E] + schedule[round] + left_rotate(digest[A], 5) };
 
-            switch ( round / 20 )
+            switch ( round / STAGE_ROUNDS )
             {
                 case 0:
                 {
@@ -210,9 +200,9 @@ namespace math_nerd
         {
             std::string hex{};
 
-            for ( auto shift{ 0u }; shift <= 28; shift += 4 )
+            for ( auto shift{ 0u }; shift <= WORD_BITS - 4; shift += 4 )
             {
-                hex += nibble_to_hex( (word >> (28 - shift)) & 0xF);
+                hex += nibble_to_hex( (word >> (WORD_BITS - 4 - shift)) & 0xF);
             }
 
             return hex;
