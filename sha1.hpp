@@ -219,10 +219,13 @@ namespace math_nerd
                     process( message_schedule, digest, round );
                 }
 
-                for ( auto i{ 0u }; i < DIGEST_SIZE; ++i )
+                constexpr auto const add = []( auto first, auto second )
                 {
-                    digest[i] += temp_digest[i];
-                }
+                    return first + second;
+                };
+
+                std::transform( std::begin(digest), std::end(digest), std::begin(temp_digest),
+                                std::begin(digest), add);
             }
 
             return digest_to_hex( digest );
