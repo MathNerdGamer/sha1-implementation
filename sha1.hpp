@@ -1,6 +1,6 @@
 #pragma once
 #ifndef MATH_NERD_SHA1_HPP
-#define SHA1_HPP
+#define MATH_NERD_SHA1_HPP
 #include <algorithm>
 #include <array>
 #include <cstdint>
@@ -235,4 +235,4 @@ namespace math_nerd
 
 } // namespace math_nerd
 
-#endif // SHA1_HPP
+#endif // MATH_NERD_SHA1_HPP
